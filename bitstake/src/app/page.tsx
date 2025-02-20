@@ -1,101 +1,142 @@
-import Image from "next/image";
+// File: pages/index.jsx
+'use client';
 
-export default function Home() {
+import React, { useState, useContext } from 'react';
+import { ArrowLeftRight, ChartLine, Shield, Wallet } from 'lucide-react';
+import { UserContext } from '../context/UserContext';
+import OverviewPanel from '../components/OverviewPanel';
+import StakePanel from '../components/StakePanel';
+import SwapPanel from '../components/SwapPanel';
+import RewardsPanel from '../components/RewardsPanel';
+import { FloatingDock } from '@/components/ui/floating-dock';
+import {
+  IconBrandGithub,
+  IconBrandX,
+
+  IconBrandTelegram,
+} from "@tabler/icons-react";
+
+// If you have a floating-dock or footer component, import it here.
+// For now, we'll just show a placeholder in the pinned footer.
+
+const Page = () => {
+  const [activeTab, setActiveTab] = useState('Overview');
+  const { userData, connectWallet } = useContext(UserContext);
+
+    // Links for your FloatingDock (or any other footer content)
+    const links = [
+      {
+        title: "Changelog",
+        icon: <IconBrandTelegram className="h-full w-full text-neutral-500 dark:text-neutral-300" />,
+        href: "https://t.me/bifrost_io",
+      },
+      {
+        title: "Twitter",
+        icon: <IconBrandX className="h-full w-full text-neutral-500 dark:text-neutral-300" />,
+        href: "https://x.com/Bifrost",
+      },
+      {
+        title: "GitHub",
+        icon: <IconBrandGithub className="h-full w-full text-neutral-500 dark:text-neutral-300" />,
+        href: "https://github.com/bifrost-io",
+      },
+    ];
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    <div className="min-h-screen flex flex-col bg-neutral-50">
+      {/* Header */}
+      <header className="flex justify-end p-4 text-white">
+        <div className="flex items-center gap-4">
+          {userData ? (
+            <div className="flex items-center gap-2">
+              <Wallet size={20} />
+              <span className="text-sm">{userData.walletAddress}</span>
+            </div>
+          ) : (
+            <button
+              onClick={connectWallet}
+              className="flex items-center gap-2 bg-gradient-to-r from-indigo-500 to-purple-500 px-4 py-2 rounded hover:opacity-90 transition-opacity"
+            >
+              <Wallet size={20} />
+              <span>Connect Wallet</span>
+            </button>
+          )}
+        </div>
+      </header>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+      {/* Main Content */}
+      {/* pb-28 ensures space for the fixed footer; adjust as needed */}
+      <main className="flex-grow p-8 sm:p-20 pb-28">
+        <div className="text-center">
+          <h2 className="text-md md:text-2xl bg-clip-text text-transparent bg-gradient-to-b from-neutral-800 to-neutral-400 font-sans font-bold">
+            Bifrost Liquid Staking
+          </h2>
+          <p className="text-zinc-600 text-sm mt-2">
+            Stake, Swap, Track Rewards, and View Your Overview Across Multiple Chains
+          </p>
+        </div>
+
+        {/* Tabs */}
+        <div className="w-full max-w-4xl mx-auto mt-8">
+          <div className="flex justify-center gap-8">
+            <button
+              onClick={() => setActiveTab('Overview')}
+              className={`flex items-center gap-2 px-4 py-2 text-zinc-600 hover:opacity-90 transition-opacity ${
+                activeTab === 'Overview' ? 'border-b-2 border-current' : ''
+              }`}
+            >
+              <span>Overview</span>
+            </button>
+            <button
+              onClick={() => setActiveTab('Stake')}
+              className={`flex items-center gap-2 px-4 py-2 text-zinc-600 hover:opacity-90 transition-opacity ${
+                activeTab === 'Stake' ? 'border-b-2 border-current' : ''
+              }`}
+            >
+              <Shield width={20} height={20} />
+              <span>Stake</span>
+            </button>
+            <button
+              onClick={() => setActiveTab('Swap')}
+              className={`flex items-center gap-2 px-4 py-2 text-zinc-600 hover:opacity-90 transition-opacity ${
+                activeTab === 'Swap' ? 'border-b-2 border-current' : ''
+              }`}
+            >
+              <ArrowLeftRight width={20} height={20} />
+              <span>Swap</span>
+            </button>
+            <button
+              onClick={() => setActiveTab('Rewards')}
+              className={`flex items-center gap-2 px-4 py-2 text-zinc-600 hover:opacity-90 transition-opacity ${
+                activeTab === 'Rewards' ? 'border-b-2 border-current' : ''
+              }`}
+            >
+              <ChartLine width={20} height={20} />
+              <span>Rewards</span>
+            </button>
+          </div>
+
+          {/* Panel Container */}
+          <div className="mt-8 min-h-[400px]">
+            {activeTab === 'Overview' && <OverviewPanel />}
+            {activeTab === 'Stake' && <StakePanel />}
+            {activeTab === 'Swap' && <SwapPanel />}
+            {activeTab === 'Rewards' && <RewardsPanel />}
+          </div>
         </div>
       </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
+
+      {/* Fixed Footer */}
+      <footer className="fixed bottom-0 left-0 w-full  text-white p-2">
+        <div className="flex items-center justify-center">
+          <FloatingDock
+            mobileClassName=""
+            items={links}
           />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
+        </div>
       </footer>
     </div>
   );
 }
+
+export default Page;
